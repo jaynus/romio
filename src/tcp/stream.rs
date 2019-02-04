@@ -513,7 +513,7 @@ impl TcpStream {
    /// # Ok(())}
    /// ```
     pub fn get_underlying_ref(&self) -> &mio::net::TcpStream {
-        self.io.ge vf t_ref()
+        self.io.get_ref()
     }
 }
 
