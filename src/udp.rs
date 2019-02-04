@@ -368,6 +368,64 @@ impl UdpSocket {
     pub fn leave_multicast_v6(&self, multiaddr: &Ipv6Addr, interface: u32) -> io::Result<()> {
         self.io.get_ref().leave_multicast_v6(multiaddr, interface)
     }
+
+    /// Returns a mutable reference to the underlying stream.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// #![feature(async_await, await_macro, futures_api)]
+    /// # use std::error::Error;
+    /// use romio::udp::UdpSocket;
+    ///
+    /// const THE_MERCHANT_OF_VENICE: &[u8] = b"
+    ///     If you prick us, do we not bleed?
+    ///     If you tickle us, do we not laugh?
+    ///     If you poison us, do we not die?
+    ///     And if you wrong us, shall we not revenge?
+    /// ";
+    ///
+    /// # async fn send_data() -> Result<(), Box<dyn Error + 'static>> {
+    /// let addr = "127.0.0.1:0".parse()?;
+    /// let target = "127.0.0.1:7878".parse()?;
+    /// let mut socket = UdpSocket::bind(&addr)?;
+    ///
+    /// socket.get_underlying_mut().send_to(THE_MERCHANT_OF_VENICE, &target)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn get_underlying_mut(&mut self) -> &mut mio::net::UdpSocket {
+        self.io.get_mut()
+    }
+
+    /// Returns an immutable reference to the underlying stream.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// #![feature(async_await, await_macro, futures_api)]
+    /// # use std::error::Error;
+    /// use romio::udp::UdpSocket;
+    ///
+    /// const THE_MERCHANT_OF_VENICE: &[u8] = b"
+    ///     If you prick us, do we not bleed?
+    ///     If you tickle us, do we not laugh?
+    ///     If you poison us, do we not die?
+    ///     And if you wrong us, shall we not revenge?
+    /// ";
+    ///
+    /// # async fn send_data() -> Result<(), Box<dyn Error + 'static>> {
+    /// let addr = "127.0.0.1:0".parse()?;
+    /// let target = "127.0.0.1:7878".parse()?;
+    /// let mut socket = UdpSocket::bind(&addr)?;
+    ///
+    /// await!(socket.send_to(THE_MERCHANT_OF_VENICE, &target))?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn get_underlying_ref(&self) -> &mio::net::UdpSocket {
+        self.io.get_ref()
+    }
 }
 
 impl fmt::Debug for UdpSocket {

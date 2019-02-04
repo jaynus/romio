@@ -477,10 +477,47 @@ impl TcpStream {
     pub fn set_linger(&self, dur: Option<Duration>) -> io::Result<()> {
         self.io.get_ref().set_linger(dur)
     }
+
+    /// Returns a mutable reference to the underlying stream.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// #![feature(async_await, await_macro, futures_api)]
+    /// use romio::tcp::TcpStream;
+    /// use std::io::Write;
+    ///
+    /// # async fn run () -> Result<(), Box<dyn std::error::Error + 'static>> {
+    /// let mut stream = await!(TcpStream::connect(&"127.0.0.1:7878".parse()?))?;
+    /// // This allows us to use the underlying sync-stream for immediate read/write operations
+    /// stream.get_underlying_mut().write(b"abc123")?;
+    /// # Ok(())}
+    /// ```
+    pub fn get_underlying_mut(&mut self) -> &mut mio::net::TcpStream {
+        self.io.get_mut()
+    }
+
+    /// Returns an immutable reference to the underlying stream.
+   ///
+   /// # Examples
+   ///
+   /// ```rust
+   /// #![feature(async_await, await_macro, futures_api)]
+   /// use romio::tcp::TcpStream;
+   /// use std::io::Write;
+   ///
+   /// # async fn run () -> Result<(), Box<dyn std::error::Error + 'static>> {
+   /// let mut stream = await!(TcpStream::connect(&"127.0.0.1:7878".parse()?))?;
+   /// // This allows us to use the underlying sync-stream for immediate read/write operations
+   /// let underlying = stream.get_underlying_ref();
+   /// # Ok(())}
+   /// ```
+    pub fn get_underlying_ref(&self) -> &mio::net::TcpStream {
+        self.io.ge vf t_ref()
+    }
 }
 
 // ===== impl Read / Write =====
-
 impl AsyncRead for TcpStream {
     fn poll_read(&mut self, lw: &LocalWaker, buf: &mut [u8]) -> Poll<io::Result<usize>> {
         <&TcpStream>::poll_read(&mut &*self, lw, buf)
